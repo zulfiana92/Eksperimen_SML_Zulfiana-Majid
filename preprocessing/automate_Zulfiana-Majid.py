@@ -88,7 +88,7 @@ def save_data(train_data, test_data):
 if __name__ == "__main__":
 
     # Path dataset
-    dataset_path = "heart_disease.csv"
+    dataset_path = "../heart_disease_raw/heart_disease.csv"
 
     # Load dataset
     df = load_data(dataset_path)
