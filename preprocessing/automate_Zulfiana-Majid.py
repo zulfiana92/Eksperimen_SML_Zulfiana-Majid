@@ -58,4 +58,8 @@ if __name__ == "__main__":
     dataset_path = "heart_disease_raw/heart_disease.csv"  # ✅ fix
     df = load_data(dataset_path)
     train_data, test_data = preprocess_data(df)
+<<<<<<< HEAD
     save_data(train_data, test_data)
+=======
+    save_data(train_data, test_data)
+>>>>>>> e0e79a780ac258f75553e1e536cd528b76cf55d2

@@ -28,4 +28,4 @@ jobs:
 
       - name: Run Preprocessing Script
         run: |
-          python automate_Zulfiana-Majid.py
+          python preprocessing/automate_Zulfiana-Majid.py
