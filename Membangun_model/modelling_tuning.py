@@ -100,7 +100,6 @@ def save_roc_curve(model, X_test, y_test):
 if __name__ == "__main__":
     X_train, X_test, y_train, y_test = load_data()
 
-    # Hyperparameter tuning dengan GridSearchCV
     param_grid = {
         'n_estimators': [50, 100, 200],
         'max_depth': [None, 5, 10],
@@ -125,37 +124,39 @@ if __name__ == "__main__":
         y_pred = grid_search.predict(X_test)
         y_prob = grid_search.predict_proba(X_test)[:, 1]
 
-        # ── Manual Logging: Parameters ──
+        # ── Parameters ──
         mlflow.log_params(best_params)
 
-        # ── Manual Logging: Metrics (sama dengan autolog) ──
-        mlflow.log_metric("accuracy", accuracy_score(y_test, y_pred))
-        mlflow.log_metric("precision", precision_score(y_test, y_pred))
-        mlflow.log_metric("recall", recall_score(y_test, y_pred))
-        mlflow.log_metric("f1_score", f1_score(y_test, y_pred))
-        mlflow.log_metric("roc_auc", roc_auc_score(y_test, y_prob))
+        # ── Metrics ──
+        mlflow.log_metric("accuracy",      accuracy_score(y_test, y_pred))
+        mlflow.log_metric("precision",     precision_score(y_test, y_pred))
+        mlflow.log_metric("recall",        recall_score(y_test, y_pred))
+        mlflow.log_metric("f1_score",      f1_score(y_test, y_pred))
+        mlflow.log_metric("roc_auc",       roc_auc_score(y_test, y_prob))
         mlflow.log_metric("best_cv_score", grid_search.best_score_)
 
-        # ── Manual Logging: Model ──
-        mlflow.sklearn.log_model(best_model, "random_forest_model")
+        # ── Model ──
+        mlflow.sklearn.log_model(
+            sk_model=best_model,
+            artifact_path="random_forest_model",
+            registered_model_name="random_forest_model"
+        )
 
-        # ── Artefak Tambahan 1: Confusion Matrix ──
+        # ── Artefak Tambahan → masuk subfolder evaluation ──
         cm_path = save_confusion_matrix(y_test, y_pred)
-        mlflow.log_artifact(cm_path)
+        mlflow.log_artifact(cm_path,  artifact_path="random_forest_model/evaluation")  # ✅
 
-        # ── Artefak Tambahan 2: Feature Importance ──
         fi_path = save_feature_importance(grid_search, list(X_train.columns))
-        mlflow.log_artifact(fi_path)
+        mlflow.log_artifact(fi_path,  artifact_path="random_forest_model/evaluation")  # ✅
 
-        # ── Artefak Tambahan 3: ROC Curve ──
         roc_path = save_roc_curve(grid_search, X_test, y_test)
-        mlflow.log_artifact(roc_path)
+        mlflow.log_artifact(roc_path, artifact_path="random_forest_model/evaluation")  # ✅
 
-        # ── Classification Report ──
         report = classification_report(y_test, y_pred)
         with open("classification_report.txt", "w") as f:
             f.write(report)
-        mlflow.log_artifact("classification_report.txt")
+        mlflow.log_artifact("classification_report.txt",
+                       artifact_path="random_forest_model/evaluation")             # ✅
 
         print("\n📊 Best Parameters:", best_params)
         print("✅ Accuracy :", accuracy_score(y_test, y_pred))
